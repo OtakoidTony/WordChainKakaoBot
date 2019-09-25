@@ -7,12 +7,17 @@ import random
 import json
 from alliteration import *
 
+app = Flask(__name__)
+
 ERROR_MESSAGE = '네트워크 접속에 문제가 발생하였습니다. 잠시 후 다시 시도해주세요.'
 
 each_server = {}
 
-app = Flask(__name__)
-
+@app.route('/keyboard')
+def Keyboard():
+    dataSend = {
+    }
+    return jsonify(dataSend)
 
 def send(text):
     res = {
@@ -60,9 +65,15 @@ def patch_data(dict, null_name, null_data):
         dict[null_name] = null_data
 
 
-@app.route('/wordchain', methods=['POST'])
-def wordchain():
-    req = request.get_json()
+
+@app.route('/message', methods=['POST'])
+def Message():
+    """
+            사용자가 보낸 session 정보를 통해
+            수정 역할을 합니다.
+            :return: 수정 여부를 반환합니다.
+            """
+    req = request.get_json(force=True)
     user_id = req["userRequest"]["user"]["id"]
     message = req["userRequest"]["utterance"]
     print(user_id)
@@ -188,4 +199,4 @@ def wordchain():
 
 # 메인 함수
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, threaded=True)
+    app.run(host="0.0.0.0", debug='True')
