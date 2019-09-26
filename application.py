@@ -1,16 +1,13 @@
 from flask import Flask, request, jsonify
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
+from alliteration import *
 import urllib
-
 import random
 import json
-from alliteration import *
 
 app = Flask(__name__)
-
 ERROR_MESSAGE = '네트워크 접속에 문제가 발생하였습니다. 잠시 후 다시 시도해주세요.'
-
 each_server = {}
 
 @app.route('/keyboard')
@@ -18,6 +15,7 @@ def Keyboard():
     dataSend = {
     }
     return jsonify(dataSend)
+
 
 def send(text):
     res = {
@@ -59,20 +57,13 @@ def load():
         hanbangSet.add(j)
         wordDict[j[0]].remove(j)
 
-
 def patch_data(dict, null_name, null_data):
     if not (null_name in dict):
         dict[null_name] = null_data
 
-
-
+        
 @app.route('/message', methods=['POST'])
 def Message():
-    """
-            사용자가 보낸 session 정보를 통해
-            수정 역할을 합니다.
-            :return: 수정 여부를 반환합니다.
-            """
     req = request.get_json(force=True)
     user_id = req["userRequest"]["user"]["id"]
     message = req["userRequest"]["utterance"]
@@ -106,7 +97,6 @@ def Message():
                 this_server["alreadySet"].add(this_server["lastWord"])
                 this_server["who"] = 'USER'
                 this_server["firstTurn"] = False
-
         res = {
             "version" : "2.0",
             "template": {
@@ -120,7 +110,6 @@ def Message():
             }
         }
         return jsonify(res)
-
     else:
         if this_server["isPlaying"] and this_server["who"] == 'USER' and not this_server["firstTurn"]:
             if message == '!exit' or message == '!기권':
@@ -176,7 +165,6 @@ def Message():
                 this_server["firstLetter"] = this_server["lastWord"][-1]
                 if not list(filter(lambda x: x not in this_server["alreadySet"],
                                    wordDict.get(this_server["firstLetter"], set()))):
-                    # 라운드 종료
                     this_server["who"] = 'CPU'
                     this_server["isPlaying"] = False
                     this_server["win"] += 1
@@ -197,6 +185,5 @@ def Message():
     return None
 
 
-# 메인 함수
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug='True')
